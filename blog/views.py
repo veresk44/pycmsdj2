@@ -34,9 +34,13 @@ class CategoryView(View):
         context = {'category_posts': category_posts, 'category': category}
         return render(request, 'blog/category_detail.html', context)
 
-# class TagView(View):
-#     """Вывод статей по тегам"""
-#     def get(self, request, tag_slug):
-#          tag = Tag.objects.get(slug=tag_slug)
-#          post_list = tag.filter()
+
+class TagView(View):
+    """Вывод статей по тегам"""
+    def get(self, request, tag_slug):
+         tag = Tag.objects.get(slug=tag_slug)
+         posts_list = tag.tag.all()
+         print(posts_list)
+         context = {'tag': tag, 'posts_list': posts_list}
+         return render(request, 'blog/tag_detail.html', context)
 
