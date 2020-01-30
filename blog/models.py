@@ -24,13 +24,18 @@ class Category(MPTTModel):
     paginated = models.PositiveIntegerField('Количество новостей на страницу', default=5)
     sort = models.PositiveIntegerField('Порядок', default=0)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Категория новостей'
         verbose_name_plural = 'Категории новостей'
 
+    class MPTTMeta:
+        order_insertion_by = ('sort',)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'category_slug': self.slug})
 
 class Tag(models.Model):
     name = models.CharField('Тег', max_length=200)
@@ -92,6 +97,10 @@ class Post(models.Model):
     class Meta:
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
+        ordering = ["sort", "-published_date"]
+
+    def get_category_template(self):
+        return self.category.template
 
     def get_absolute_url(self):
         return reverse('detail_post', kwargs={'category': self.category.slug, 'slug': self.slug})
@@ -120,7 +129,7 @@ class Comment(models.Model):
     )
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
-    moderation = models.BooleanField(default=False)
+    moderation = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'Комментарий'
